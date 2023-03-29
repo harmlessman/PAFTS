@@ -1,21 +1,34 @@
 from pydub import AudioSegment
-from pathlib import Path
-from data_info import is_audio
+from PAFTS.datasets.dataset import Dataset
+from PAFTS.datasets.dataset import AUDIO_FILE_EXT
 
 
-def change_sr(path, sr=22050):
-    file_list = [p for p in Path(path).glob("**/*") if is_audio(p)]
+def change_sr(dataset: Dataset, sr: int = 22050):
+    items = dataset.get_audio_file()
 
-    for file in file_list:
-        audio = AudioSegment.from_file(file)
+    for item in items:
+        audio = AudioSegment.from_file(item)
         audio = audio.set_frame_rate(sr)
-        audio.export(file, format=file.suffix[1:])
+        audio.export(item, format=item.suffix[1:])
 
 
-def change_channel(path, channel=1):
-    file_list = [p for p in Path(path).glob("**/*") if is_audio(p)]
+def change_channel(dataset: Dataset, channel: int = 1):
+    items = dataset.get_audio_file()
 
-    for file in file_list:
-        audio = AudioSegment.from_file(file)
+    for item in items:
+        audio = AudioSegment.from_file(item)
         audio = audio.set_channels(channel)
-        audio.export(file, format=file.suffix[1:])
+        audio.export(item, format=item.suffix[1:])
+
+
+def change_format(dataset: Dataset, formats: str = 'wav'):
+    if formats not in AUDIO_FILE_EXT:
+        return
+
+    items = dataset.get_audio_file()
+
+    for item in items:
+        audio = AudioSegment.from_file(item)
+        audio.export(item, formats=formats)
+
+
