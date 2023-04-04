@@ -1,9 +1,13 @@
 from pydub import AudioSegment
+
+from pathlib import Path
+
 from PAFTS.datasets.dataset import Dataset
-from PAFTS.datasets.dataset import AUDIO_FILE_EXT
+from PAFTS.utils.data_info import AUDIO_FILE_EXT
 
 
 def change_sr(dataset: Dataset, sr: int = 22050):
+    """Change sampling rate of the audio files"""
     items = dataset.get_audio_file()
 
     for item in items:
@@ -13,6 +17,7 @@ def change_sr(dataset: Dataset, sr: int = 22050):
 
 
 def change_channel(dataset: Dataset, channel: int = 1):
+    """Change channel of the audio files"""
     items = dataset.get_audio_file()
 
     for item in items:
@@ -22,6 +27,7 @@ def change_channel(dataset: Dataset, channel: int = 1):
 
 
 def change_format(dataset: Dataset, formats: str = 'wav'):
+    """Change format of the audio files"""
     if formats not in AUDIO_FILE_EXT:
         return
 
@@ -30,5 +36,19 @@ def change_format(dataset: Dataset, formats: str = 'wav'):
     for item in items:
         audio = AudioSegment.from_file(item)
         audio.export(item, formats=formats)
+
+
+def rmtree(path):
+    """
+    This function acts like shutil.rmtree.
+    Delete all directories and files in the path.
+
+    """
+    for d in Path(path).glob('*'):
+        if d.is_dir():
+            rmtree(d)
+        else:
+            d.unlink()
+    path.rmdir()
 
 
