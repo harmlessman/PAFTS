@@ -2,35 +2,35 @@ from spleeter.separator import Separator
 from spleeter.utils.logging import logger
 from tqdm import tqdm
 
+
 from pathlib import Path
-from filecmp import cmp
 from multiprocessing import freeze_support
 import logging
 
 from PAFTS.datasets.dataset import Dataset
-from PAFTS.utils.data_info import get_audio_file
 
 logger.setLevel(logging.WARNING)
+logging.getLogger('tensorflow').setLevel(logging.CRITICAL)
 
 
 def delete_bgm(dataset: Dataset):
+    """
+    Remove BGM from the audio file and save audio file as a same file name.
+    Please note that the original file will be deleted.
+
+    Spleeter library was used to remove the BGM
+
+    Args:
+        dataset (Dataset): Dataset.
+    """
+
     freeze_support()
 
-    print(f'Delete_bgm is starting...\n')
-
-    output_path = dataset.output_path
+    print(f'> Delete BGM...')
+    print(f'| > Number of items : {dataset.get_file_num()}')
+    print(f'| > Path : {dataset.path}\n')
 
     items = dataset.get_audio_file()
-    output_path_items = get_audio_file(output_path)
-
-    if not output_path.exists():
-        output_path.mkdir()
-
-    if any(Path(output_path).iterdir()):
-        print(f'{output_path} is not empty!')
-        print(f'If output_path has an item, pass it.\n')
-
-    items = [item for item in items if item not in output_path_items]
 
     separator = Separator('spleeter:2stems')
     accompaniment = Path('accompaniment.wav')
@@ -42,29 +42,33 @@ def delete_bgm(dataset: Dataset):
                leave=True,
                )
 
+    success = 0
+    failure = []
+
     for item in bar:
         bar.set_description(item.name)
-        separator.separate_to_file(
-            str(item),
-            str(output_path),
-            filename_format='{instrument}.{codec}'
-        )
+        try:
+            separator.separate_to_file(
+                str(item),
+                str(dataset.path),
+                filename_format='{instrument}.{codec}'
+            )
+            success += 1
+
+        except:
+            failure.append(item)
+            continue
 
         name = Path(item.name)
 
-        Path(output_path / accompaniment).unlink()
+        (dataset.path / accompaniment).unlink()
+        (dataset.path / name).unlink()
 
-        if (output_path / name).exists():
-            if cmp((output_path / name), (output_path / vocal)):
-                (output_path / vocal).unlink()
+        (dataset.path / vocal).rename(dataset.path / name)
 
-            else:
-                i = 0
-                while (output_path / Path(f'{item.stem}_{i}{item.suffix}')).exists():
-                    i += 1
-                (output_path / vocal).rename(output_path / Path(f'{item.stem}_{i}{item.suffix}'))
+    print(f'\n| > Number of Success items : {success}')
+    print(f'| > Number of failure items : {len(failure)}')
+    print(f'| > fail item')
+    for f in failure:
+        print(f'    > {f}')
 
-        else:
-            (output_path / vocal).rename(output_path / name)
-
-    print('Done!')
