@@ -2,7 +2,6 @@ from spleeter.separator import Separator
 from spleeter.utils.logging import logger
 from tqdm import tqdm
 
-
 from pathlib import Path
 from multiprocessing import freeze_support
 import logging
@@ -18,7 +17,7 @@ def delete_bgm(dataset: Dataset):
     Remove BGM from the audio file and save audio file as a same file name.
     Please note that the original file will be deleted.
 
-    Spleeter library was used to remove the BGM
+    Spleeter library was used to remove the BGM.
 
     Args:
         dataset (Dataset): Dataset.
@@ -28,7 +27,7 @@ def delete_bgm(dataset: Dataset):
 
     print(f'> Delete BGM...')
     print(f'| > Number of items : {dataset.get_file_num()}')
-    print(f'| > Path : {dataset.path}\n')
+    print(f'| > Path : {dataset.path}')
 
     items = dataset.get_audio_file()
 
@@ -66,9 +65,12 @@ def delete_bgm(dataset: Dataset):
 
         (dataset.path / vocal).rename(dataset.path / name)
 
-    print(f'\n| > Number of Success items : {success}')
+    print(f'| > Number of Success items : {success}')
     print(f'| > Number of failure items : {len(failure)}')
-    print(f'| > fail item')
-    for f in failure:
-        print(f'    > {f}')
 
+    if failure:
+        print(f'| > fail item')
+        for f in failure:
+            print(f'    > {f}')
+
+    print()

@@ -1,3 +1,8 @@
 .idea/
-data/
 PAFTS/cleaner/pretrained_models/2stems/
+key.json
+test.py
+data
+data2
+data3
+data4
