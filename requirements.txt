@@ -1,2 +1,4 @@
 spleeter
 pydub
+SpeechRecognition
+tqdm
