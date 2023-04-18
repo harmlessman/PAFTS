@@ -16,21 +16,21 @@ def rmtree(path):
     path.rmdir()
 
 
-def save_dict(path, dic: dict, output_name: str = 'text.json'):
+def save_dict(path, dic: dict, file_name: str = 'text.json'):
     """
     Save the dict as a json file.
 
     Args:
         path (str or Path): Path to save the text file.
         dic (dict): Audio file and text pairs.
-        output_name (str, optional): Output text file name. Defaults to 'text.json'.
+        file_name (str, optional): Output text file name. Defaults to 'text.json'.
 
     """
-    with open(Path(path) / Path(output_name), 'w', encoding="utf-8") as f:
+    with open(Path(path) / Path(file_name), 'w', encoding="utf-8") as f:
         json.dump(dic, f, ensure_ascii=False, indent='\t')
 
-    print(f'Saved at {Path(path) / Path(output_name)}')
-    return Path(path) / Path(output_name)
+    print(f'Saved at {Path(path) / Path(file_name)}')
+    return Path(path) / Path(file_name)
 
 
 def delete_none_value(path, dic: dict):
@@ -70,14 +70,14 @@ def delete_none_value(path, dic: dict):
     return dic
 
 
-def make_key_file(path):
+def make_key_file(path: str = '', file_name: str = 'key.json'):
     """
     Make key file frame as a json file.
     You can leave unused API keys blank.
 
     Args:
         path (str): key file path.
-
+        file_name (str): key file name.
     """
 
     key_frame = {
@@ -87,7 +87,7 @@ def make_key_file(path):
             'location': ''
         }
     }
-    with open(Path(path) / Path('key.json'), 'w', encoding="utf-8") as f:
+    with open(Path(path) / Path(file_name), 'w', encoding="utf-8") as f:
         json.dump(key_frame, f, ensure_ascii=False, indent='\t')
 
 

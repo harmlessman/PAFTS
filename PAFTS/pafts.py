@@ -10,7 +10,7 @@ from PAFTS.utils.file_utils import save_dict, delete_none_value
 
 class PAFTS:
     """
-        -
+        Make audio files into a dataset for TTS.
 
         Args:
             dataset_path (str): Directory path with audio files.
@@ -31,7 +31,7 @@ class PAFTS:
             >>> pafts.transform_items(sr=22050, channel=1, formats='audio format')
             >>> pafts.delete_bgm()
             >>> dic = pafts.stt(stt_api_name='stt api name')
-            >>> pafts.save(dic=dic, output_name='text.json')
+            >>> pafts.save(dic=dic, file_name='text.json')
 
         """
 
@@ -105,19 +105,19 @@ class PAFTS:
         elif stt_api_name == 'azure_stt':
             return azure_stt(dataset=self.dataset, key_path=self.key_path, abs_path=abs_path)
 
-    def save(self, dic: dict, output_name: str = 'text.json', delete_none: bool = True):
+    def save(self, dic: dict, file_name: str = 'text.json', delete_none: bool = True):
         """
         Save the dict as a json file.
 
         Args:
             dic (dict): Audio file and text pairs.
-            output_name (str, optional): Output text file name. Defaults to 'text.json'.
+            file_name (str, optional): Output text file name. Defaults to 'text.json'.
             delete_none (bool, optional): Delete the none value of the dic. Defaults to True.
         """
         if delete_none:
             dic = delete_none_value(path=self.dataset.path, dic=dic)
 
-        save_dict(path=self.dataset.path, dic=dic, output_name=output_name)
+        save_dict(path=self.dataset.path, dic=dic, file_name=file_name)
 
     def check_args(self, stt_api_name: str):
         """
@@ -153,7 +153,7 @@ class PAFTS:
             channel: int = 1,
             formats: str = 'wav',
             stt_api_name: str = 'google_web_speech',
-            output_name: str = 'text.json',
+            file_name: str = 'text.json',
             delete_none: bool = True
 
     ):
@@ -172,7 +172,7 @@ class PAFTS:
             channel (int, optional): Audio file's channel. Defaults to 1.
             formats (str, optional): Audio file's format. Defaults to 'wav'.
             stt_api_name (str, optional): Name of the speech to text api to use. Defaults to 'google_web_speech'.
-            output_name (str, optional): Output text file name. Defaults to 'text.json'.
+            file_name (str, optional): Output text file name. Defaults to 'text.json'.
             delete_none (bool, optional): Delete the none value of the dic. Defaults to True.
 
         """
@@ -191,6 +191,6 @@ class PAFTS:
 
         dic = self.stt(stt_api_name=stt_api_name)
 
-        self.save(dic=dic, output_name=output_name, delete_none=delete_none)
+        self.save(dic=dic, file_name=file_name, delete_none=delete_none)
 
         print('Successfully Completed.')
