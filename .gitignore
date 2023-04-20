@@ -1,5 +1,5 @@
 .idea/
-PAFTS/cleaner/pretrained_models/2stems/
+pafts/cleaner/pretrained_models/2stems/
 key.json
 test.py
 data

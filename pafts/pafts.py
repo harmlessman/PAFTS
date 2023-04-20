@@ -1,11 +1,11 @@
 from pathlib import Path
 import json
 
-from PAFTS.datasets.dataset import Dataset
-from PAFTS.utils.transform import change_sr, change_channel, change_format
-from PAFTS.cleaner.delete_bgm import delete_bgm
-from PAFTS.stt.stt_apis import google_web_speech, google_cloud_stt, azure_stt, STT_API_LIST
-from PAFTS.utils.file_utils import save_dict, delete_none_value
+from pafts.datasets.dataset import Dataset
+from pafts.utils.transform import change_sr, change_channel, change_format
+from pafts.cleaner.delete_bgm import delete_bgm
+from pafts.stt.stt_apis import google_web_speech, google_cloud_stt, azure_stt, STT_API_LIST
+from pafts.utils.file_utils import save_dict, delete_none_value
 
 
 class PAFTS:
@@ -21,12 +21,12 @@ class PAFTS:
                 Defaults to None.
 
         Example with quick start:
-            >>> from PAFTS.pafts import PAFTS
+            >>> from pafts.pafts import PAFTS
             >>> pafts = PAFTS(dataset_path="your dataset path", language='language')
             >>> pafts.run()
 
         If you want to task step by step:
-            >>> from PAFTS.pafts import PAFTS
+            >>> from pafts.pafts import PAFTS
             >>> pafts = PAFTS(dataset_path="your dataset path", language='language', dataset_name='dataset name', key_path='api key path')
             >>> pafts.transform_items(sr=22050, channel=1, formats='audio format')
             >>> pafts.delete_bgm()

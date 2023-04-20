@@ -1,7 +1,7 @@
 from pydub import AudioSegment
 
-from PAFTS.datasets.dataset import Dataset
-from PAFTS.utils.data_info import AUDIO_FILE_EXT
+from pafts.datasets.dataset import Dataset
+from pafts.utils.data_info import AUDIO_FILE_EXT
 
 
 def change_sr(dataset: Dataset, sr: int = 22050):

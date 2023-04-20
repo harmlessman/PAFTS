@@ -6,7 +6,7 @@ from pathlib import Path
 from multiprocessing import freeze_support
 import logging
 
-from PAFTS.datasets.dataset import Dataset
+from pafts.datasets.dataset import Dataset
 
 logger.setLevel(logging.WARNING)
 logging.getLogger('tensorflow').setLevel(logging.CRITICAL)

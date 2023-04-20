@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from PAFTS.utils.data_info import is_audio, get_duration
-from PAFTS.utils.file_utils import rmtree
+from pafts.utils.data_info import is_audio, get_duration
+from pafts.utils.file_utils import rmtree
 
 
 class Dataset:

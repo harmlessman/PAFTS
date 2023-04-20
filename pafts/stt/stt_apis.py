@@ -5,7 +5,7 @@ import time
 import speech_recognition as sr
 from tqdm import tqdm
 
-from PAFTS.datasets.dataset import Dataset
+from pafts.datasets.dataset import Dataset
 
 STT_API_LIST = [
     'google_web_speech',
