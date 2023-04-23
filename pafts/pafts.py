@@ -75,10 +75,15 @@ class PAFTS:
         change_format(self.dataset, formats=formats)
         print()
 
-    def delete_bgm(self):
-        """Delete BGM from audio file"""
+    def delete_bgm(self, multiprocess: bool = False):
+        """
+        Delete BGM from audio file
 
-        delete_bgm(self.dataset)
+        Args:
+            multiprocess (bool): Multiprocessing Delete BGM. Defaults to False.
+        """
+
+        delete_bgm(self.dataset, multiprocess=multiprocess)
 
     def stt(self, stt_api_name: str = 'google_web_speech', abs_path: bool = False):
         """
@@ -152,6 +157,7 @@ class PAFTS:
             sr: int = 22050,
             channel: int = 1,
             formats: str = 'wav',
+            multiprocess: bool = False,
             stt_api_name: str = 'google_web_speech',
             file_name: str = 'text.json',
             delete_none: bool = True
@@ -171,10 +177,10 @@ class PAFTS:
             sr (int, optional): Audio file's sampling rate. Defaults to 22050.
             channel (int, optional): Audio file's channel. Defaults to 1.
             formats (str, optional): Audio file's format. Defaults to 'wav'.
+            multiprocess (bool): Multiprocessing Delete BGM. Defaults to False.
             stt_api_name (str, optional): Name of the speech to text api to use. Defaults to 'google_web_speech'.
             file_name (str, optional): Output text file name. Defaults to 'text.json'.
             delete_none (bool, optional): Delete the none value of the dic. Defaults to True.
-
         """
         print('>> Run...')
 
@@ -187,7 +193,7 @@ class PAFTS:
 
         self.transform_items(sr, channel, formats)
 
-        self.delete_bgm()
+        self.delete_bgm(multiprocess=multiprocess)
 
         dic = self.stt(stt_api_name=stt_api_name)
 

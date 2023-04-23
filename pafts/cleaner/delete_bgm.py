@@ -12,7 +12,7 @@ logger.setLevel(logging.WARNING)
 logging.getLogger('tensorflow').setLevel(logging.CRITICAL)
 
 
-def delete_bgm(dataset: Dataset):
+def delete_bgm(dataset: Dataset, multiprocess: bool = False):
     """
     Remove BGM from the audio file and save audio file as a same file name.
     Please note that the original file will be deleted.
@@ -21,6 +21,7 @@ def delete_bgm(dataset: Dataset):
 
     Args:
         dataset (Dataset): Dataset.
+        multiprocess (bool): Multiprocessing Delete BGM. Defaults to False.
     """
 
     freeze_support()
@@ -31,7 +32,7 @@ def delete_bgm(dataset: Dataset):
 
     items = dataset.get_audio_file()
 
-    separator = Separator('spleeter:2stems')
+    separator = Separator('spleeter:2stems', multiprocess=multiprocess)
     accompaniment = Path('accompaniment.wav')
     vocal = Path('vocals.wav')
 
