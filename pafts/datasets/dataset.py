@@ -1,4 +1,5 @@
 from pathlib import Path
+import datetime
 
 from pafts.utils.data_info import is_audio, get_duration
 from pafts.utils.file_utils import rmtree
@@ -112,5 +113,5 @@ class Dataset:
         print(f'| > Path : {self.path}')
         print(f'| > language : {self.language}')
         print(f'| > Number of files : {self.get_file_num()}')
-        print(f'| > Total duration : {self.get_total_duration()}')
+        print(f'| > Total duration : {datetime.timedelta(seconds=self.get_total_duration())}')
         print()
