@@ -142,7 +142,10 @@ class PAFTS:
                 '[!] Unsupported api. Please choose one of these.\n google_web_speech, azure_stt, google_cloud_stt')
 
         if stt_api_name != 'google_web_speech':
-            if not Path(self.key_path).exists() or not self.key_path:
+            if not self.key_path:
+                raise Exception('[!] Key path does not exist!')
+
+            if not Path(self.key_path).exists():
                 raise Exception('[!] Key path is not correct!')
 
             with open(self.key_path, 'r', encoding="utf-8") as f:
