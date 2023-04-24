@@ -1,8 +1,23 @@
 .idea/
-pafts/cleaner/pretrained_models/2stems/
+
+
+# key file
 key.json
+
+# test source
 test.py
+
+# audio data
 data
 data2
 data3
 data4
+
+
+# spleeter pretrained model
+pretrained_models
+
+
+dist
+build
+pafts.egg-info
