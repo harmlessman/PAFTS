@@ -67,6 +67,7 @@ STT operation generates text corresponding to the audio files.
 * If you use Google Cloud Speech API or Azure STT API, you need API key.
 * ****❗ The audio files may be modified or changed during the Transform process and Delete BGM process, so please back up the original audio files.****
 * ****❗ Google Cloud Speech API and Azure STT API will be charged if they exceed the free usage, so please check the price options carefully.****
+* ****❗❗ We are not responsible for the transformation of audio files due to the use of PAFTS or the payment of fees due to the use of STT API.****
 
 ## Requirements
 
@@ -213,7 +214,14 @@ pip install pafts
             └── c_d_1.wav
     ```
 
+## License
+
+The code of **PAFTS** is [MIT-licensed](LICENSE)
 
 
+## Disclaimer
 
+We are not responsible for the transformation of audio files due to the use of PAFTS or the payment of fees due to the use of STT API.
+
+You agree that you use [PAFTS](https://github.com/harmlessman/PAFTS) at your own risk.
 
