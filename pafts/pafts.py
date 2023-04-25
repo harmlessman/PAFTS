@@ -28,7 +28,7 @@ class PAFTS:
         If you want to task step by step:
             >>> from pafts.pafts import PAFTS
             >>> pafts = PAFTS(dataset_path="your dataset path", language='language', dataset_name='dataset name', key_path='api key path')
-            >>> pafts.transform_items(sr=22050, channel=1, formats='audio format')
+            >>> pafts.transform_items(formats='audio format', sr=22050, channel=1)
             >>> pafts.delete_bgm()
             >>> dic = pafts.stt(stt_api_name='stt api name')
             >>> pafts.save(dic=dic, file_name='text.json')
@@ -56,23 +56,21 @@ class PAFTS:
         print()
         self.dataset.flatten()
 
-    def transform_items(self, sr: int = 22050, channel: int = 1, formats: str = 'wav'):
+    def transform_items(self, formats: str = 'wav', sr: int = 22050, channel: int = 1):
         """
-        Change sampling rate, channel, format
+        Change format, sampling rate, channel
 
         Args:
+            formats (str, optional): Audio file's format. Defaults to 'wav'.
             sr (int, optional): Audio file's sampling rate. Defaults to 22050.
             channel (int, optional): Audio file's channel. Defaults to 1.
-            formats (str, optional): Audio file's format. Defaults to 'wav'.
         """
 
-        print(f'> Transform items...')
-        print(f'| > sr : {sr}')
-        print(f'| > channel : {channel}')
-        print(f'| > format : {formats}')
+        print(f'> Transform items...\n| > format : {formats}\n| > sr : {sr}\n| > channel : {channel}\n')
+
+        change_format(self.dataset, formats=formats)
         change_sr(self.dataset, sr=sr)
         change_channel(self.dataset, channel=channel)
-        change_format(self.dataset, formats=formats)
         print()
 
     def delete_bgm(self, multiprocess: bool = False):
@@ -157,9 +155,9 @@ class PAFTS:
     def run(
             self,
             flat: bool = False,
+            formats: str = 'wav',
             sr: int = 22050,
             channel: int = 1,
-            formats: str = 'wav',
             multiprocess: bool = False,
             stt_api_name: str = 'google_web_speech',
             file_name: str = 'text.json',
@@ -177,9 +175,9 @@ class PAFTS:
 
         Args:
             flat (bool, optional): Flatten directory structure. Defaults to False.
+            formats (str, optional): Audio file's format. Defaults to 'wav'.
             sr (int, optional): Audio file's sampling rate. Defaults to 22050.
             channel (int, optional): Audio file's channel. Defaults to 1.
-            formats (str, optional): Audio file's format. Defaults to 'wav'.
             multiprocess (bool): Multiprocessing Delete BGM. Defaults to False.
             stt_api_name (str, optional): Name of the speech to text api to use. Defaults to 'google_web_speech'.
             file_name (str, optional): Output text file name. Defaults to 'text.json'.
@@ -194,7 +192,7 @@ class PAFTS:
         if flat:
             self.flatten()
 
-        self.transform_items(sr, channel, formats)
+        self.transform_items(formats=formats, sr=sr, channel=channel)
 
         self.delete_bgm(multiprocess=multiprocess)
 
