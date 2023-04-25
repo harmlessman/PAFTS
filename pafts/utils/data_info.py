@@ -1,20 +1,12 @@
 
 from pydub import AudioSegment
 from pathlib import Path
-
-AUDIO_FILE_EXT = [
-    'wav',
-    'mp3',
-    'raw',
-    'pcm',
-    'mp4',
-    'mkv'
-]
+from pafts.utils import AUDIO_FORMATS
 
 
 def is_audio(path):
     file = Path(path)
-    if file.suffix[1:] in AUDIO_FILE_EXT:
+    if file.suffix[1:] in AUDIO_FORMATS:
         return True
     return False
 

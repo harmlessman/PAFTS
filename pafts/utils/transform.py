@@ -1,7 +1,7 @@
 from pydub import AudioSegment
 
 from pafts.datasets.dataset import Dataset
-from pafts.utils.data_info import AUDIO_FILE_EXT
+from pafts.utils import AUDIO_FORMATS
 
 
 def change_sr(dataset: Dataset, sr: int = 22050):
@@ -26,7 +26,7 @@ def change_channel(dataset: Dataset, channel: int = 1):
 
 def change_format(dataset: Dataset, formats: str = 'wav'):
     """Change format of the audio files"""
-    if formats not in AUDIO_FILE_EXT:
+    if formats not in AUDIO_FORMATS:
         raise Exception(f'Do not support {formats} format.')
 
     items = dataset.get_audio_file()
