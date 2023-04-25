@@ -33,8 +33,6 @@ def delete_bgm(dataset: Dataset, multiprocess: bool = False):
     items = dataset.get_audio_file()
 
     separator = Separator('spleeter:2stems', multiprocess=multiprocess)
-    accompaniment = Path('accompaniment.wav')
-    vocal = Path('vocals.wav')
 
     bar = tqdm(items,
                total=len(items),
@@ -46,12 +44,18 @@ def delete_bgm(dataset: Dataset, multiprocess: bool = False):
     failure = []
 
     for item in bar:
+        formats = item.suffix
+
+        accompaniment = Path('accompaniment').with_suffix(formats)
+        vocal = Path('vocals').with_suffix(formats)
+
         bar.set_description(item.name)
         try:
             separator.separate_to_file(
                 str(item),
                 str(dataset.path),
-                filename_format='{instrument}.{codec}'
+                filename_format='{instrument}.{codec}',
+                codec=formats[1:],
             )
             success += 1
 

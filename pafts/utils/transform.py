@@ -33,7 +33,8 @@ def change_format(dataset: Dataset, formats: str = 'wav'):
 
     for item in items:
         audio = AudioSegment.from_file(item)
-        audio.export(item, format=formats)
+        item.unlink()
+        audio.export(item.with_suffix('.' + formats), format=formats)
 
 
 
