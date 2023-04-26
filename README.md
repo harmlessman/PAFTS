@@ -14,7 +14,7 @@ PAFTS consist of three main operations.
 2. Delete BGM
 3. STT
 
-Transform operations changes the sampling rate(sr), channel, and format of the audio files.
+Transform operation changes the sampling rate(sr), channel, and format of the audio files.
 
 Delete BGM operation removes background music from audio files.
 
@@ -52,7 +52,16 @@ STT operation generates text corresponding to the audio files.
         }
 ```
 
+
+### Supported Audio Formats
+
+* **wav, mp3, ogg, flac**
+* **Recommend using wav format** because it is much faster in Transform operation and Delete BGM operation.
+* STT operation support **wav, flac** formats.
+
+
 ### Note
+
 * Audio files are not provided. Please prepare your own audio files.
 * Audio files are appropriate to say one or two sentences for 3 to 10 seconds.
 * If the background music is music with lyrics, the background music cannot be removed clearly.
@@ -61,16 +70,14 @@ STT operation generates text corresponding to the audio files.
 
 ## Features
 
-
 * Use the [spleeter](https://github.com/deezer/spleeter) to remove background music.
 * In STT, you can use [Google Web Speech](https://wicg.github.io/speech-api/), [Google Cloud Speech](https://cloud.google.com/speech-to-text) and [Azure STT](https://azure.microsoft.com/products/cognitive-services/speech-to-text/).
 * If you use Google Cloud Speech API or Azure STT API, you need API key.
-* ****❗ The audio files may be modified or changed during the Transform process and Delete BGM process, so please back up the original audio files.****
-* ****❗ Google Cloud Speech API and Azure STT API will be charged if they exceed the free usage, so please check the price options carefully.****
-* ****❗❗ We are not responsible for the transformation of audio files due to the use of PAFTS or the payment of fees due to the use of STT API.****
+* **❗ The audio files may be modified or changed during the Transform process and Delete BGM process, so please back up the original audio files.**
+* **❗ Google Cloud Speech API and Azure STT API will be charged if they exceed the free usage, so please check the price options carefully.**
+* **❗❗ We are not responsible for the transformation of audio files due to the use of PAFTS or the payment of fees due to the use of STT API.**
 
 ## Requirements
-
 
 * python >= 3.8
 * spleeter
@@ -82,14 +89,12 @@ STT operation generates text corresponding to the audio files.
 
 ## Installation
 
-
 ```
 pip install pafts
 ```
 
 
 ## Usage
-
 
 * Quick start:
     ```
@@ -110,37 +115,41 @@ pip install pafts
   
   
     >> Run...
-    | > Dataset name : dataset
-    | > Path : C:\Users\82109\Desktop\dataset
-    | > language : en-us
-    | > Number of files : 5
-    | > Total duration : 14.760000000000002
-    
-    > Transform items...
-    | > sr : 22050
-    | > channel : 1
-    | > format : wav
-    
-    > Delete BGM...
-    | > Number of items : 5
-    | > Path : C:\Users\82109\Desktop\dataset
-    abc.wav: 100%|██████████| 5/5 [00:13<00:00,  2.62s/it]
-    | > Number of Success items : 5
-    | > Number of failure items : 0
-    
-    > Preparing STT API...
-    | > STT API : google web speech
-    | > Dataset name : dataset
-    | > Path : C:\Users\82109\Desktop\dataset
-    | > language : en-us
-    | > Number of files : 5
-    | > Total duration : 14.760000000000002
-    
-    abc.wav: 100%|██████████| 5/5 [00:11<00:00,  2.27s/it]
+  | > Dataset name : dataset
+  | > Path : C:\Users\82109\Desktop\dataset
+  | > language : en-us
+  | > Number of files : 5
+  | > Total duration : 0:00:14.760000
+  
+  > Transform items...
+  | > format : wav
+  | > sr : 22050
+  | > channel : 1
+  change_format: 100%|██████████| 5/5 [00:00<00:00, 337.68it/s]
+  change_sr: 100%|██████████| 5/5 [00:00<00:00, 141.79it/s]
+  change_channel: 100%|██████████| 5/5 [00:00<00:00, 166.22it/s]
+          
+  > Delete BGM...
+  | > Number of items : 5
+  | > Path : C:\Users\82109\Desktop\dataset
+  abc.wav: 100%|██████████| 5/5 [00:08<00:00,  1.65s/it]
+  | > Number of Success items : 5
+  | > Number of failure items : 0
+  
+  > Preparing STT API...
+  | > STT API : google web speech
+  | > Dataset name : dataset
+  | > Path : C:\Users\82109\Desktop\dataset
+  | > language : en-us
+  | > Number of files : 5
+  | > Total duration : 0:00:14.760000
+  
+  abc.wav: 100%|██████████| 5/5 [00:10<00:00,  2.02s/it]
+  
+  | > Numbers of deleted files : 0
+  Saved at C:\Users\82109\Desktop\dataset\text.json
+  Successfully Completed.
 
-    | > Numbers of deleted files : 0
-    Saved at C:\Users\82109\Desktop\dataset\text.json
-    Successfully Completed.
     ```
   
     'dataset_path' is your audio files path.
@@ -152,7 +161,7 @@ pip install pafts
     ```
     from pafts import PAFTS
     pafts = PAFTS(dataset_path="your dataset path", language='language', dataset_name='dataset name', key_path='api key path')
-    pafts.transform_items(sr=22050, channel=1, formats='audio format')
+    pafts.transform_items(formats='audio format', sr=22050, channel=1)
     pafts.delete_bgm()
     dic = pafts.stt(stt_api_name='stt api name')
     pafts.save(dic=dic, output_name='text.json')
