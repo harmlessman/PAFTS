@@ -66,7 +66,7 @@ class PAFTS:
             channel (int, optional): Audio file's channel. Defaults to 1.
         """
 
-        print(f'> Transform items...\n| > format : {formats}\n| > sr : {sr}\n| > channel : {channel}\n')
+        print(f'> Transform items...\n| > format : {formats}\n| > sr : {sr}\n| > channel : {channel}')
 
         change_format(self.dataset, formats=formats)
         change_sr(self.dataset, sr=sr)
