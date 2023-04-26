@@ -8,7 +8,7 @@ with open("requirements.txt", 'r', encoding='utf-8') as f:
 
 setup(
     name='pafts',
-    version='0.0.0',
+    version='0.0.1',
     author='harmlessman',
     author_email="harmlessman17@gmail.com",
     description='Library That Preprocessing Audio For TTS.',
@@ -22,6 +22,9 @@ setup(
     classifiers=[
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Topic :: Software Development :: Libraries :: Python Modules",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         'Programming Language :: Python :: 3.8',
