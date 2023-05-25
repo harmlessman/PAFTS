@@ -1,6 +1,9 @@
 from pathlib import Path
 import json
 
+from pydub import AudioSegment
+from tqdm import tqdm
+
 
 def rmtree(path):
     """
@@ -91,3 +94,37 @@ def make_key_file(path: str = '', file_name: str = 'key.json'):
         json.dump(key_frame, f, ensure_ascii=False, indent='\t')
 
 
+def audio_duration_filter(audio_files: list, min_dur: float = 0, max_dur: float = float('inf'), path: str = ''):
+    """
+    Delete audio files that are out of time range.
+
+    Args:
+        audio_files (list): Audio file name list. if elements
+        min_dur (float): Minimum audio file duration.
+        max_dur (float): Maximum audio file duration.
+        path (str): Audio file path.
+    """
+
+    if min_dur > max_dur:
+        print(f'Min, Max range is wrong!')
+        return
+
+    deleted_count = 0
+
+    bar = tqdm(audio_files,
+               total=len(audio_files),
+               desc='dur_filter',
+               leave=True,
+               )
+
+    for audio_file in bar:
+        audio = AudioSegment.from_file(Path(path) / Path(audio_file))
+        audio_dur = audio.duration_seconds
+
+        if audio_dur < min_dur or audio_dur > max_dur:
+            audio_file.unlink()
+            deleted_count += 1
+
+    print(f'Minimum duration = {min_dur} seconds')
+    print(f'Maximum duration = {max_dur} seconds')
+    print(f'Deleted file num : {deleted_count}')
