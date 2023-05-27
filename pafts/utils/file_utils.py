@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import sys
 
 from pydub import AudioSegment
 from tqdm import tqdm
@@ -115,6 +116,7 @@ def audio_duration_filter(audio_files: list, min_dur: float = 0, max_dur: float 
                total=len(audio_files),
                desc='dur_filter',
                leave=True,
+               file=sys.stdout,
                )
 
     for audio_file in bar:

@@ -1,6 +1,7 @@
 from pathlib import Path
 import json
 import time
+import sys
 
 import speech_recognition as sr
 from tqdm import tqdm
@@ -80,6 +81,7 @@ def google_web_speech(
     bar = tqdm(items,
                total=len(items),
                leave=True,
+               file=sys.stdout,
                )
 
     for item in bar:
@@ -157,6 +159,7 @@ def google_cloud_stt(
     bar = tqdm(items,
                total=len(items),
                leave=True,
+               file=sys.stdout,
                )
 
     for item in bar:
@@ -236,10 +239,10 @@ def azure_stt(
     r = sr.Recognizer()
     key = read_key(key_path, 'azure_stt')
 
-
     bar = tqdm(items,
                total=len(items),
                leave=True,
+               file=sys.stdout,
                )
 
     for item in bar:

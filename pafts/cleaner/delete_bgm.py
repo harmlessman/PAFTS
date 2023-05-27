@@ -1,10 +1,11 @@
-from spleeter.separator import Separator
-from spleeter.utils.logging import logger
-from tqdm import tqdm
-
 from pathlib import Path
 from multiprocessing import freeze_support
 import logging
+import sys
+
+from spleeter.separator import Separator
+from spleeter.utils.logging import logger
+from tqdm import tqdm
 
 from pafts.datasets.dataset import Dataset
 
@@ -38,6 +39,7 @@ def delete_bgm(dataset: Dataset, multiprocess: bool = False):
                total=len(items),
                desc='spleeter_progress',
                leave=True,
+               file=sys.stdout,
                )
 
     success = 0

@@ -1,3 +1,5 @@
+import sys
+
 from pydub import AudioSegment
 from tqdm import tqdm
 
@@ -13,6 +15,7 @@ def change_sr(dataset: Dataset, sr: int = 22050):
                total=len(items),
                desc='change_sr',
                leave=True,
+               file=sys.stdout,
                )
 
     for item in bar:
@@ -29,6 +32,7 @@ def change_channel(dataset: Dataset, channel: int = 1):
                total=len(items),
                desc='change_channel',
                leave=True,
+               file=sys.stdout,
                )
 
     for item in bar:
@@ -48,6 +52,7 @@ def change_format(dataset: Dataset, formats: str = 'wav'):
                total=len(items),
                desc='change_format',
                leave=True,
+               file=sys.stdout,
                )
 
     for item in bar:
