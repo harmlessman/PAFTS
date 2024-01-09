@@ -164,7 +164,7 @@ pip install pafts
     pafts.transform_items(formats='audio format', sr=22050, channel=1)
     pafts.delete_bgm()
     dic = pafts.stt(stt_api_name='stt api name')
-    pafts.save(dic=dic, output_name='text.json')
+    pafts.save(dic=dic, file_name='text.json', delete_none=True) # if delete_none is True, delete the file with the stt output value null.
     ```
 
 * If you want to make key file:
