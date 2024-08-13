@@ -1,5 +1,11 @@
 # PAFTS
 
+## It will be updated soon!!!
+
+---
+
+---
+
 ### Library That Preprocessing Audio For TTS.
 
 PAFTS is a library for making Text-to-Speech dataset.
