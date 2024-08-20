@@ -1,14 +1,69 @@
 from pathlib import Path
-import datetime
 
-from pafts.utils.data_info import is_audio, get_duration
-from pafts.utils.file_utils import rmtree
+import numpy as np
+import torch
+from pydub import AudioSegment
+
+from pafts.utils.data_info import is_audio
+
+
+class Data:
+    """
+    Audio Data Class.
+
+    Args:
+        file_path (str): File path with audio files.
+    """
+
+    def __init__(
+            self,
+            file_path: str
+    ):
+        self.sr = None
+        self.channels = None
+        self.audio_data = None
+        self.duration = None
+
+        audio = AudioSegment.from_file(file_path)
+
+        self.sr = audio.frame_rate
+        self.channels = audio.channels
+
+        # 오디오 데이터를 numpy 배열로 변환
+        audio = np.array(audio.get_array_of_samples())
+
+        # 데이터 정규화 (16-bit PCM 데이터를 float32로 변환)
+        audio = audio.astype(np.float32) / 32768.0
+        audio = torch.from_numpy(audio)
+
+        self.audio_data = audio
+
+        self.duration = self.audio_data.shape[0] / self.sr
+
+    def set_sample_rate(self, sr):
+        self.sr = sr
+
+    def set_channels(self, channels):
+        self.channels = channels
+
+    def save_audio(self, output_path: str, format: str = 'wav'):
+        audio_np = self.audio_data.numpy()
+
+        # 데이터 역정규화 (float32 데이터를 16-bit PCM으로 변환)
+        audio_np = (audio_np * 32768.0).astype(np.int16)
+
+        audio = AudioSegment(
+            audio_np.tobytes(),
+            frame_rate=self.sr,
+            channels=self.channels,
+        )
+        audio.export(output_path, format=format)
 
 
 class Dataset:
     """
     Audio Dataset Class.
-    Process all audio files in path.
+    Process all audio data class.
 
     Args:
         path (str): Directory path with audio files.
@@ -16,102 +71,52 @@ class Dataset:
         language (str, optional): Language using BCP 47 language tag. Defaults to 'en-us' (English)
 
     """
+
     def __init__(
             self,
-            path: str,
+            path: str = None,
             dataset_name: str = None,
-            language: str = "en-us",
-
+            language: str = None,
     ):
-        if not Path(path).exists():
+
+        self._path = Path(path).resolve()
+        self._dataset_name = dataset_name
+        self._language = language
+        self._audios = []
+
+        if not self._path.exists():
             raise FileNotFoundError("[!] Path does not exist")
 
-        if not Path(path).is_dir():
+        if not self._path.is_dir():
             raise NotADirectoryError("[!] Path is not directory.")
 
-        self.path = Path(path)
+        if not self._dataset_name:
+            self._dataset_name = self._path.name
 
-        if dataset_name:
-            self.dataset_name = dataset_name
-        else:
-            self.dataset_name = Path(path).name
+        # find audio file in path
+        self._audios = [Data(str(p)) for p in self._path.glob("**/*") if is_audio(p)]
 
-        self.language = language
+    def __len__(self):
+        return len(self._audios)
 
-    def get_audio_file(self):
-        return [p for p in self.path.glob("**/*") if is_audio(p)]
+    def __getitem__(self, index):
+        return self._audios[index]
+
+    @property
+    def audios(self):
+        return self._audios
+
+    def print_info(self):
+        print(f'| > Dataset name : {self._dataset_name}')
+        print(f'| > Path : {self._path}')
+        print(f'| > language : {self._language}')
+        print(f'| > Number of files : {len(self._audios)}')
+        print(f'| > Total duration : {self.get_total_duration()}')
 
     def get_total_duration(self):
         total_duration = 0
-        items = self.get_audio_file()
 
-        for item in items:
-            total_duration += get_duration(item)
+        for audio in self._audios:
+            total_duration += audio.duration
         return total_duration
 
-    def get_file_num(self):
-        return len(self.get_audio_file())
-
-    def __len__(self):
-        return self.get_file_num()
-
-    def flatten(self):
-        """
-        Flatten directory structure.
-
-        Example :
-
-            before dataset structure
-
-              path
-                ├── a
-                │   ├── 1.wav
-                │   ├── 2.wav
-                │   └── 3.wav
-                ├── b
-                │   ├── 1.wav
-                │   └── 2.wav
-                ├── 1.wav
-                ├── 2.wav
-                └── c
-                    └── d
-                        └── 1.wav
-
-            after dataset structure
-
-                  path
-                    ├── a_1.wav
-                    ├── a_2.wav
-                    ├── a_3.wav
-                    ├── b_1.wav
-                    ├── b_2.wav
-                    ├── 1.wav
-                    ├── 2.wav
-                    └── c_d_1.wav
-
-        """
-        items = self.get_audio_file()
-
-        for item in items:
-            p = item.parent
-            if p.samefile(self.path):
-                name = item.name
-            else:
-                front_list = str(p.relative_to(self.path)).split('\\')
-                name = '_'.join((front_list + [item.name]))
-
-            item.rename(self.path / name)
-
-        # remove empty directory
-        dir_list = [i for i in self.path.glob('*') if i.is_dir()]
-
-        for d in dir_list:
-            rmtree(d)
-
-    def print_info(self):
-        print(f'| > Dataset name : {self.dataset_name}')
-        print(f'| > Path : {self.path}')
-        print(f'| > language : {self.language}')
-        print(f'| > Number of files : {self.get_file_num()}')
-        print(f'| > Total duration : {datetime.timedelta(seconds=self.get_total_duration())}')
-        print()
