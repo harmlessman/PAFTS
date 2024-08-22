@@ -23,6 +23,7 @@ class Data:
         self.channels = None
         self.audio_data = None
         self.duration = None
+        self._name = Path(file_path).name
 
         audio = AudioSegment.from_file(file_path)
 
@@ -58,6 +59,10 @@ class Data:
             channels=self.channels,
         )
         audio.export(output_path, format=format)
+
+    @property
+    def name(self):
+        return self._name
 
 
 class Dataset:
@@ -105,6 +110,10 @@ class Dataset:
     @property
     def audios(self):
         return self._audios
+
+    @property
+    def dataset_name(self):
+        return self._dataset_name
 
     def print_info(self):
         print(f'| > Dataset name : {self._dataset_name}')
