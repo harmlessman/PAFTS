@@ -5,7 +5,7 @@ import whisper
 from whisper.tokenizer import LANGUAGES
 from tqdm import tqdm
 
-from pafts.datasets.dataset import Data, Dataset
+from pafts.datasets.dataset import Dataset
 
 whisper_model = {
     "tiny": None,
@@ -17,7 +17,7 @@ whisper_model = {
 
 
 def whisper_stt(
-        data: Data,
+        audio: Path,
         model_size='base',
         language=None,
 ):
@@ -46,14 +46,13 @@ def whisper_stt(
         raise ValueError(
             f"[!] This language is not supported. Please select one of the language codes below\n{LANGUAGES}")
 
-    result = whisper_model[model_size].transcribe(data.audio_data)
+    result = whisper_model[model_size].transcribe(str(audio))
 
     return result['text']
 
 
 def STT(
         dataset: Dataset,
-        output_path: str,
         format='json',
         model_size='base',
         language=None
@@ -76,6 +75,8 @@ def STT(
     audios = dataset.audios
     stt_dict = {}
 
+    output_path = dataset.output_path
+
     bar = tqdm(audios,
                total=len(audios),
                leave=True,
@@ -86,10 +87,10 @@ def STT(
         stt_dict[audio.name] = text
 
     if format=='json':
-        with open(Path(output_path) / Path(f'{dataset.dataset_name}.json'), 'w') as f:
-            json.dump(stt_dict, f, indent=4)
+        with open(Path(output_path) / Path(f'{dataset.dataset_name}.json'), 'w', encoding='UTF8') as f:
+            json.dump(stt_dict, f, indent=4, ensure_ascii=False)
     elif format=='txt':
-        with open(Path(output_path) / Path(f'{dataset.dataset_name}.json'), 'w') as f:
+        with open(Path(output_path) / Path(f'{dataset.dataset_name}.json'), 'w', encoding='UTF8') as f:
             for k, v in stt_dict:
                 f.write(f'{k}|v\n')
     else:
