@@ -1,68 +1,26 @@
 from pathlib import Path
 
-import numpy as np
-import torch
 from pydub import AudioSegment
 
-from pafts.utils.data_info import is_audio
+"""Supported Audio formats"""
+AUDIO_FORMATS = [
+    'wav',
+    'mp3',
+    'ogg',
+    'flac'
+]
 
 
-class Data:
-    """
-    Audio Data Class.
+def is_audio(path):
+    file = Path(path)
+    if file.suffix[1:] in AUDIO_FORMATS:
+        return True
+    return False
 
-    Args:
-        file_path (str): File path with audio files.
-    """
 
-    def __init__(
-            self,
-            file_path: str
-    ):
-        self.sr = None
-        self.channels = None
-        self.audio_data = None
-        self.duration = None
-        self._name = Path(file_path).name
-
-        audio = AudioSegment.from_file(file_path)
-
-        self.sr = audio.frame_rate
-        self.channels = audio.channels
-
-        # 오디오 데이터를 numpy 배열로 변환
-        audio = np.array(audio.get_array_of_samples())
-
-        # 데이터 정규화 (16-bit PCM 데이터를 float32로 변환)
-        audio = audio.astype(np.float32) / 32768.0
-        audio = torch.from_numpy(audio)
-
-        self.audio_data = audio
-
-        self.duration = self.audio_data.shape[0] / self.sr
-
-    def set_sample_rate(self, sr):
-        self.sr = sr
-
-    def set_channels(self, channels):
-        self.channels = channels
-
-    def save_audio(self, output_path: str, format: str = 'wav'):
-        audio_np = self.audio_data.numpy()
-
-        # 데이터 역정규화 (float32 데이터를 16-bit PCM으로 변환)
-        audio_np = (audio_np * 32768.0).astype(np.int16)
-
-        audio = AudioSegment(
-            audio_np.tobytes(),
-            frame_rate=self.sr,
-            channels=self.channels,
-        )
-        audio.export(output_path, format=format)
-
-    @property
-    def name(self):
-        return self._name
+def get_duration(path):
+    audio = AudioSegment.from_file(path)
+    return audio.duration_seconds
 
 
 class Dataset:
@@ -74,6 +32,7 @@ class Dataset:
         path (str): Directory path with audio files.
         dataset_name (str, optional): Dataset name. Defaults to dataset_path's directory name.
         language (str, optional): Language using BCP 47 language tag. Defaults to 'en-us' (English)
+        output_path (str): Output Directory. Defaults to './pafts_output'
 
     """
 
@@ -82,9 +41,11 @@ class Dataset:
             path: str = None,
             dataset_name: str = None,
             language: str = None,
+            output_path: str = 'pafts_output'
     ):
 
         self._path = Path(path).resolve()
+        self._output_path = Path(output_path)
         self._dataset_name = dataset_name
         self._language = language
         self._audios = []
@@ -98,8 +59,12 @@ class Dataset:
         if not self._dataset_name:
             self._dataset_name = self._path.name
 
+        if not self._output_path.exists():
+            self._output_path.mkdir(parents=True)
+
         # find audio file in path
-        self._audios = [Data(str(p)) for p in self._path.glob("**/*") if is_audio(p)]
+        # self._audios = [Data(str(p)) for p in self._path.glob("**/*") if is_audio(p)]
+        self._audios = [Path(p) for p in self._path.glob("**/*") if is_audio(p)]
 
     def __len__(self):
         return len(self._audios)
@@ -111,9 +76,20 @@ class Dataset:
     def audios(self):
         return self._audios
 
+    @audios.setter
+    def audios(self, audios):
+        if isinstance(audios, list) and all(isinstance(audio, Path) for audio in audios):
+            self._audios = audios
+        else:
+            raise ValueError("[!] The input value is not a list or the element in the list is not a Path type.")
+
     @property
     def dataset_name(self):
         return self._dataset_name
+
+    @property
+    def output_path(self):
+        return self._output_path
 
     def print_info(self):
         print(f'| > Dataset name : {self._dataset_name}')
@@ -126,6 +102,5 @@ class Dataset:
         total_duration = 0
 
         for audio in self._audios:
-            total_duration += audio.duration
+            total_duration += get_duration(audio)
         return total_duration
-
