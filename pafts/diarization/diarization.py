@@ -13,6 +13,7 @@ def vad(
     model = load_silero_vad()
     audios = dataset.audios
     stamp = []
+    new_audios = []
 
     for audio in audios:
         wav = read_audio(str(audio))
@@ -38,6 +39,12 @@ def vad(
 
             file_name = audio.with_name(f'{audio.stem}_{i}{audio.suffix}')
             file_name = file_name.name
-            segment.export(dataset.output_path / file_name, format=audio.suffix[1:])
 
+            path = (dataset.output_path / file_name).resolve()
+            segment.export(path, format=audio.suffix[1:])
 
+            new_audios.append(path)
+
+    dataset.audios = new_audios
+
+    return new_audios
