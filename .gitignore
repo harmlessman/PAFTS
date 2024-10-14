@@ -21,3 +21,7 @@ pretrained_models
 dist
 build
 pafts.egg-info
+
+
+*.wav
+*.mp3
