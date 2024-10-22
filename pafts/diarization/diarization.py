@@ -2,6 +2,58 @@ from pafts.datasets.dataset import Dataset
 
 from silero_vad import load_silero_vad, read_audio, get_speech_timestamps
 from pydub import AudioSegment
+from pyannote.audio import Pipeline
+import torch
+
+
+def diarization(
+    dataset: Dataset,
+        hf_token,
+
+
+):
+    pipeline = Pipeline.from_pretrained(
+        "pyannote/speaker-diarization-3.1",
+        use_auth_token=hf_token)
+
+    pipeline.to(torch.device("cuda"))
+    seg = None
+    padding = AudioSegment.silent(duration=1000)
+
+    for audio in dataset.audios:
+        print(audio.name)
+        if not seg:
+            seg = AudioSegment.from_file(audio)
+        else:
+            seg += AudioSegment.from_file(audio)
+        seg += padding
+
+    samples = seg.get_array_of_samples()
+    sample_rate = seg.frame_rate
+
+    waveform = torch.tensor(samples).float().reshape(1, -1)
+
+    audio_input = {
+        "waveform": waveform,
+        "sample_rate": sample_rate
+    }
+
+    diarization_audio = pipeline('audio_20min/obama.mp3')
+    print(diarization_audio)
+
+    for i, (turn, _, speaker) in enumerate(diarization_audio.itertracks(yield_label=True)):
+        start_ms = turn.start * 1000
+        end_ms = turn.end * 1000
+
+        speaker_folder = dataset.output_path / f"speaker_{speaker}"
+        speaker_folder.mkdir(parents=True, exist_ok=True)
+
+        segment = seg[start_ms:end_ms]
+
+        output_file_path = speaker_folder / f"{i}_segment.wav"
+        segment.export(output_file_path, format="wav")
+
+        print(f"Saved segment {i} for speaker {speaker}: {output_file_path}")
 
 
 def vad(
@@ -48,3 +100,4 @@ def vad(
     dataset.audios = new_audios
 
     return new_audios
+
