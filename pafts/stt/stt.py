@@ -53,7 +53,7 @@ def whisper_stt(
 
 def STT(
         dataset: Dataset,
-        format='json',
+        output_format='json',
         model_size='base',
         language=None
 ):
@@ -86,13 +86,13 @@ def STT(
         text = whisper_stt(audio, model_size, language)
         stt_dict[audio.name] = text
 
-    if format=='json':
+    if output_format == 'json':
         with open(Path(output_path) / Path(f'{dataset.dataset_name}.json'), 'w', encoding='UTF8') as f:
             json.dump(stt_dict, f, indent=4, ensure_ascii=False)
-    elif format=='txt':
-        with open(Path(output_path) / Path(f'{dataset.dataset_name}.json'), 'w', encoding='UTF8') as f:
+    elif output_format == 'txt':
+        with open(Path(output_path) / Path(f'{dataset.dataset_name}.txt'), 'w', encoding='UTF8') as f:
             for k, v in stt_dict:
-                f.write(f'{k}|v\n')
+                f.write(f'{k}|{v}\n')
     else:
         raise ValueError(
             f"[!] Please choose one of the following format: json, txt.")
