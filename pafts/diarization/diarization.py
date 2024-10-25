@@ -1,3 +1,8 @@
+import uuid
+from datetime import datetime
+from pathlib import Path
+from collections import defaultdict
+
 from pafts.datasets.dataset import Dataset
 
 from silero_vad import load_silero_vad, read_audio, get_speech_timestamps
@@ -6,40 +11,64 @@ from pyannote.audio import Pipeline
 import torch
 
 
+def generate_unique_filename(format="wav"):
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    unique_id = uuid.uuid4().hex
+    return f"temp_audio_{timestamp}_{unique_id}.{format}"
+
+
 def diarization(
-    dataset: Dataset,
+        dataset: Dataset,
         hf_token,
 
-
 ):
+    """
+    This function performs diarization (speaker separation) on the audio files,
+    splits them by sentence, and then separates the audio by each speaker.
+
+    Args:
+        dataset (Dataset): Dataset instance.
+        hf_token (str): Huggingface access token.
+
+    Return:
+        new_audios (list): List of new audio path.
+
+    """
+
     pipeline = Pipeline.from_pretrained(
         "pyannote/speaker-diarization-3.1",
         use_auth_token=hf_token)
 
-    pipeline.to(torch.device("cuda"))
+    # check using gpu or not
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        print("Using GPU...")
+    else:
+        device = torch.device("cpu")
+        print("Using CPU...")
+
+    pipeline.to(device)
+
     seg = None
     padding = AudioSegment.silent(duration=1000)
 
     for audio in dataset.audios:
-        print(audio.name)
         if not seg:
             seg = AudioSegment.from_file(audio)
         else:
             seg += AudioSegment.from_file(audio)
         seg += padding
 
-    samples = seg.get_array_of_samples()
-    sample_rate = seg.frame_rate
+    temp_file_path = dataset.output_path / generate_unique_filename()
 
-    waveform = torch.tensor(samples).float().reshape(1, -1)
+    # create audio temp file
+    seg.export(temp_file_path, format='wav')
 
-    audio_input = {
-        "waveform": waveform,
-        "sample_rate": sample_rate
-    }
+    # diarization
+    diarization_audio = pipeline(f"{temp_file_path}")
 
-    diarization_audio = pipeline('audio_20min/obama.mp3')
-    print(diarization_audio)
+    speaker_num_list = defaultdict(int)
+    new_audios = []
 
     for i, (turn, _, speaker) in enumerate(diarization_audio.itertracks(yield_label=True)):
         start_ms = turn.start * 1000
@@ -50,10 +79,20 @@ def diarization(
 
         segment = seg[start_ms:end_ms]
 
-        output_file_path = speaker_folder / f"{i}_segment.wav"
+        output_file_path = speaker_folder / f"{speaker}_{speaker_num_list[speaker]}.wav"
         segment.export(output_file_path, format="wav")
 
-        print(f"Saved segment {i} for speaker {speaker}: {output_file_path}")
+        speaker_num_list[speaker] += 1  # +1
+
+        new_audios += speaker_folder / f"{speaker}_{speaker_num_list[speaker]}.wav"
+
+    # delete temp file
+    if Path(temp_file_path).exists():
+        temp_file_path.unlink()
+
+    dataset.audios = new_audios
+
+    return new_audios
 
 
 def vad(
@@ -100,4 +139,3 @@ def vad(
     dataset.audios = new_audios
 
     return new_audios
-
