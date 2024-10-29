@@ -91,6 +91,24 @@ class Dataset:
     def output_path(self):
         return self._output_path
 
+    @property
+    def path(self):
+        return self._path
+
+    @output_path.setter
+    def output_path(self, output_path):
+        if (isinstance(output_path, str) or isinstance(output_path, Path)) and Path(output_path).exists():
+            self._output_path = output_path
+        else:
+            raise ValueError("[!] The input is wrong.")
+
+    @path.setter
+    def path(self, path):
+        if (isinstance(path, str) or isinstance(path, Path)) and Path(path).exists():
+            self._path = path
+        else:
+            raise ValueError("[!] The input is wrong.")
+
     def print_info(self):
         print(f'| > Dataset name : {self._dataset_name}')
         print(f'| > Path : {self._path}')
