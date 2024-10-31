@@ -84,7 +84,7 @@ def diarization(
 
         speaker_num_list[speaker] += 1  # +1
 
-        new_audios += speaker_folder / f"{speaker}_{speaker_num_list[speaker]}.wav"
+        new_audios.append(speaker_folder / f"{speaker}_{speaker_num_list[speaker]}.wav")
 
     # delete temp file
     if Path(temp_file_path).exists():

@@ -106,6 +106,7 @@ class Dataset:
     def path(self, path):
         if (isinstance(path, str) or isinstance(path, Path)) and Path(path).exists():
             self._path = path
+            self._audios = [Path(p) for p in self._path.glob("**/*") if is_audio(p)]
         else:
             raise ValueError("[!] The input is wrong.")
 
