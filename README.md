@@ -148,7 +148,7 @@ p.run()
 ```
 
 ## TODO
--[ ] Command line
+- [ ] Command line
 - [ ] Clean logging
 - [ ] Separator with Model Selection
 - [ ] Update README.md
