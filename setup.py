@@ -8,7 +8,7 @@ with open("requirements.txt", 'r', encoding='utf-8') as f:
 
 setup(
     name='pafts',
-    version='0.0.1',
+    version='1.0.0',
     author='harmlessman',
     author_email="harmlessman17@gmail.com",
     description='Library That Preprocessing Audio For TTS.',
@@ -17,7 +17,7 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     url='https://github.com/harmlessman/PAFTS',
-    python_requires=">=3.8, <3.11",
+    python_requires=">=3.10, <3.11",
     packages=find_packages(),
     classifiers=[
         "Intended Audience :: Science/Research",
@@ -27,8 +27,6 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
     ]
 
