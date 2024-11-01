@@ -4,7 +4,6 @@ SpeechRecognition
 tqdm
 #torch
 
-openai-whisper
 
 
 # audio_separator
@@ -13,7 +12,6 @@ requests >= 2
 librosa >=0.10
 samplerate == 0.1.0
 six >=1.16
-
 
 onnx>=1.14
 onnx2torch >=1.5
@@ -30,3 +28,9 @@ rotary-embedding-torch ==0.6.1
 scipy ==1.13.0
 
 silero_vad
+
+# diarization
+pyannote.audio
+
+# STT
+openai-whisper
