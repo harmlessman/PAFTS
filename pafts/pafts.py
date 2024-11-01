@@ -1,12 +1,13 @@
+import shutil
 from pathlib import Path
 import uuid
 from datetime import datetime
 
 from pafts.datasets.dataset import Dataset
-from pafts.utils.transform import change_sr, change_channel, change_format
 from pafts.diarization.diarization import diarization
 from pafts.separator.separator import separator
 from pafts.stt.stt import STT
+
 
 class PAFTS:
     """
@@ -19,10 +20,12 @@ class PAFTS:
         output_path (str): Output Directory. Defaults to './pafts_output'
 
         Example with quick start:
-
-
-        If you want to task step by step:
-
+        p = PAFTS(
+            path = 'your_audio_directory_path',
+            output_path = 'output_path',
+            hf_token="HUGGINGFACE_ACCESS_TOKEN_GOES_HERE"
+        )
+        p.run()
 
 
         """
@@ -45,24 +48,6 @@ class PAFTS:
             output_path=output_path
         )
 
-    def transform_items(self, formats: str = 'wav', sr: int = 22050, channel: int = 1):
-        """
-        Change format, sampling rate, channel
-
-        Args:
-            formats (str, optional): Audio file's format. Defaults to 'wav'.
-            sr (int, optional): Audio file's sampling rate. Defaults to 22050.
-            channel (int, optional): Audio file's channel. Defaults to 1.
-        """
-
-        print(f'> Transform items...\n| > format : {formats}\n| > sr : {sr}\n| > channel : {channel}')
-
-        change_format(self.dataset, formats=formats)
-        change_sr(self.dataset, sr=sr)
-        change_channel(self.dataset, channel=channel)
-        print()\
-
-
     def separator(self):
         separator(self._dataset)
         return
@@ -79,36 +64,43 @@ class PAFTS:
         STT(self._dataset, output_format=output_format, model_size=model_size)
         return
 
+    def _stage_process(self, process_function, *args, **kwargs):
+        # Create unique temp directory
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        unique_id = uuid.uuid4().hex
+        temp_dir = Path.cwd() / f"temp_dir_{timestamp}_{unique_id}"
+        temp_dir.mkdir(exist_ok=True)
+
+        self._dataset.output_path = temp_dir
+        process_function(self._dataset, *args, **kwargs)
+
+        # Update dataset path
+        self._dataset.path = temp_dir
+
+        return temp_dir
+
     def run(self):
-        # 1stage, separator
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        unique_id = uuid.uuid4().hex
+        original_output = self._dataset.output_path
 
-        temp_dir = Path.cwd() / f"temp_dir_{timestamp}_{unique_id}"
-        temp_dir.mkdir(exist_ok=True)
+        # Stage 1: separator
+        temp_dir1 = self._stage_process(separator)
 
-        self._dataset.output_path = temp_dir
-        separator(self._dataset)
-        self._dataset.path = temp_dir
+        # Stage 2: diarization
+        temp_dir2 = self._stage_process(diarization, hf_token=self._hf_token)
 
-        # 2stage, diarization
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        unique_id = uuid.uuid4().hex
+        # Stage 3: STT
+        temp_dir3 = self._stage_process(STT)
 
-        temp_dir = Path.cwd() / f"temp_dir_{timestamp}_{unique_id}"
-        temp_dir.mkdir(exist_ok=True)
+        original_output.mkdir(exist_ok=True)
 
-        self._dataset.output_path = temp_dir
-        diarization(self._dataset, hf_token=self._hf_token)
-        self._dataset.path = temp_dir
+        for temp_dir in [temp_dir2, temp_dir3]:
+            for file in temp_dir.rglob('*'):
+                if file.is_file():
+                    relative_path = file.relative_to(temp_dir)
+                    destination = original_output / relative_path
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(file, destination)
 
-        # 3stage, stt
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        unique_id = uuid.uuid4().hex
-
-        temp_dir = Path.cwd() / f"temp_dir_{timestamp}_{unique_id}"
-        temp_dir.mkdir(exist_ok=True)
-
-        self._dataset.output_path = temp_dir
-        STT(self._dataset)
-
+        # Cleanup
+        for temp_dir in [temp_dir1, temp_dir2, temp_dir3]:
+            shutil.rmtree(temp_dir, ignore_errors=True)
