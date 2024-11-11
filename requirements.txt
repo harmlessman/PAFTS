@@ -7,6 +7,7 @@ tqdm
 
 
 # audio_separator
+audio-separator[gpu]
 requests >= 2
 
 librosa >=0.10
