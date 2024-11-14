@@ -5,7 +5,7 @@
 
 ### Library That Preprocessing Audio For TTS.
 This library enables easy processing of audio files into a format suitable for TTS training data with a simple execution.
-
+![architecture](architecture.png)
 
 ## Description 
 PAFTS have three features.
