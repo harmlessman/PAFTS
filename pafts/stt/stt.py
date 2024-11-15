@@ -8,13 +8,7 @@ from tqdm import tqdm
 
 from pafts.datasets.dataset import Dataset
 
-whisper_model = {
-    "tiny": None,
-    "base": None,
-    "small": None,
-    "medium": None,
-    "large": None
-}
+whisper_model = {key: None for key in whisper._MODELS}
 
 
 def whisper_stt(
@@ -27,7 +21,7 @@ def whisper_stt(
         If there is no gpu or low performance, use the base model.
 
         Args:
-            data (Data): Audio data.
+            audio (Data): Audio data.
             model_size (str): Size of the whisper model.
             language (str): Language of the audio file to run STT.
 
@@ -64,8 +58,7 @@ def STT(
 
     Args:
         dataset (Dataset): Audio dataset Class
-        output_path (str): Output path
-        format (str): Output format, Defaults is json (json or txt)
+        output_format (str): Output format, Defaults is json (json or txt)
         model_size (str): Size of the whisper model.
         language (str): Language of the audio file to run STT.
 
