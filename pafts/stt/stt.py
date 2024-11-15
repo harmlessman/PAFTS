@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from collections import defaultdict
 
 import whisper
 from whisper.tokenizer import LANGUAGES
@@ -73,7 +74,7 @@ def STT(
 
     """
     audios = dataset.audios
-    stt_dict = {}
+    stt_dict = defaultdict(dict)
 
     output_path = dataset.output_path
 
@@ -84,17 +85,18 @@ def STT(
 
     for audio in bar:
         text = whisper_stt(audio, model_size, language)
-        stt_dict[audio.name] = text
+        stt_dict[audio.parent.name][audio.name] = text
 
-    if output_format == 'json':
-        with open(Path(output_path) / Path(f'{dataset.dataset_name}.json'), 'w', encoding='UTF8') as f:
-            json.dump(stt_dict, f, indent=4, ensure_ascii=False)
-    elif output_format == 'txt':
-        with open(Path(output_path) / Path(f'{dataset.dataset_name}.txt'), 'w', encoding='UTF8') as f:
-            for k, v in stt_dict:
-                f.write(f'{k}|{v}\n')
-    else:
-        raise ValueError(
-            f"[!] Please choose one of the following format: json, txt.")
+    for speaker in stt_dict:
+        if output_format == 'json':
+            with open(Path(output_path) / Path(f'{speaker}.json'), 'w', encoding='UTF8') as f:
+                json.dump(stt_dict[speaker], f, indent=4, ensure_ascii=False)
+        elif output_format == 'txt':
+            with open(Path(output_path) / Path(f'{speaker}.txt'), 'w', encoding='UTF8') as f:
+                for k, v in stt_dict[speaker]:
+                    f.write(f'{k}|{v}\n')
+        else:
+            raise ValueError(
+                f"[!] Please choose one of the following format: json, txt.")
 
     return stt_dict
